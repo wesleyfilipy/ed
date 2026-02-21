@@ -949,6 +949,7 @@
       const SECONDS_TO_SHOW = 1200; // 20 minutes
       const REDIRECT_URL = "https://b059akggmd0cwrcpw94hhgpp5x.hop.clickbank.net";
       let ctaShown = false;
+      let exitAttemptCount = 0;
 
       function showCTA() {
         if (ctaShown) return;
@@ -959,11 +960,19 @@
         ctaShown = true;
       }
 
+      function triggerExitIntent() {
+        if (ctaShown) return;
+        exitAttemptCount++;
+        if (exitAttemptCount >= 2) {
+          const modal = document.getElementById('exitIntentModal');
+          if (modal) modal.style.display = 'flex';
+        }
+      }
+
       // Timer-based reveal
       setTimeout(showCTA, SECONDS_TO_SHOW * 1000);
 
       // Exit intent refinement
-      let exitIntentTriggered = false;
       let mouseEntered = false;
       let pageReadyForExitIntent = false;
 
@@ -976,16 +985,20 @@
         mouseEntered = true;
       });
 
+      // Desktop Exit Intent (Mouse Leave)
       document.addEventListener("mouseleave", function (e) {
-        // Trigger only if:
-        // 1. Mouse actually entered the page first
-        // 2. Mouse leaves through the top (clientY < 0)
-        // 3. CTA isn't already shown
-        // 4. Haven't triggered yet
-        // 5. Page has "settled" (2s pass)
-        if (mouseEntered && pageReadyForExitIntent && e.clientY < 0 && !ctaShown && !exitIntentTriggered) {
-          exitIntentTriggered = true;
-          document.getElementById('exitIntentModal').style.display = 'flex';
+        if (mouseEntered && pageReadyForExitIntent && e.clientY < 0 && !ctaShown) {
+          triggerExitIntent();
+        }
+      });
+
+      // Mobile/Back Button Exit Intent
+      window.history.pushState(null, null, window.location.href);
+      window.addEventListener("popstate", function (event) {
+        if (!ctaShown) {
+          triggerExitIntent();
+          // Re-push state to keep them on the page for the next attempt
+          window.history.pushState(null, null, window.location.href);
         }
       });
 
