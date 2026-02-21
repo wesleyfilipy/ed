@@ -595,7 +595,15 @@
               <div class="video-player-wrapper">
                 <div id="fullscreenDiv" class="h-0 hidden"></div>
                 <div class="smartplayer-container" id="smartplayerId">
-                  <vturb-smartplayer id="vid-698289a941110f8f73751838" style="display: block; margin: 0 auto; width: 100%; max-width: 400px;"></vturb-smartplayer> <script type="text/javascript"> var s=document.createElement("script"); s.src="https://scripts.converteai.net/74b04062-0d4e-4f42-a29e-66a4faa4b9d0/players/698289a941110f8f73751838/v4/player.js", s.async=!0,document.head.appendChild(s); </script>
+                  <script src="https://fast.wistia.com/player.js" async></script>
+                  <script src="https://fast.wistia.com/embed/luscippjn8.js" async type="module"></script>
+                  <style>wistia-player[media-id='luscippjn8']:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/luscippjn8/swatch'); display: block; filter: blur(5px); padding-top:178.06%; }</style>
+                  <wistia-player media-id="luscippjn8" aspect="0.5616224648985959"></wistia-player>
+                </div>
+              </div>
+              <div id="cta-button-container" class="esconder" style="width: 100%; margin: 0 auto; display: none;">
+                <div style="text-align: center; padding: 20px;">
+                  <a href="https://ttn.alpharestart.com/click/3" id="main-cta-button" class="btn btn--green" style="font-size: 40px; padding: 25px 40px; text-transform: uppercase;">CLICK TO BUY</a>
                 </div>
               </div>
               <div class="esconder" style="width: 100%; margin: 0 auto">
@@ -833,14 +841,44 @@
 
     <script src="js/script.js"></script>
     <script>
-      var delaySeconds = 1416;
-      var player = document.querySelector("vturb-smartplayer");
+      (function() {
+        const SECONDS_TO_SHOW = 1200; // 20 minutes
+        const REDIRECT_URL = "https://ttn.alpharestart.com/click/3";
+        let ctaShown = false;
 
-      player.addEventListener("player:ready", function () {
-        player.displayHiddenElements(delaySeconds, [".esconder"], {
-          persist: true,
+        function showCTA() {
+          if (ctaShown) return;
+          const container = document.getElementById('cta-button-container');
+          const hiddenSections = document.querySelectorAll('.esconder');
+          if (container) container.style.display = 'block';
+          hiddenSections.forEach(section => section.style.display = 'block');
+          ctaShown = true;
+        }
+
+        // Timer-based reveal
+        setTimeout(showCTA, SECONDS_TO_SHOW * 1000);
+
+        // Exit intent
+        let exitIntentTriggered = false;
+        document.addEventListener("mouseleave", function(e) {
+          if (e.clientY < 0 && !ctaShown && !exitIntentTriggered) {
+            exitIntentTriggered = true;
+            if (confirm("WAIT! Get a 70% DISCOUNT if you buy now. Click OK to claim your discount!")) {
+              window.location.href = REDIRECT_URL;
+            }
+          }
         });
-      });
+
+        // Wistia integration (optional, if we want to sync with video play time precisely)
+        window._wq = window._wq || [];
+        _wq.push({ id: "luscippjn8", onReady: function(video) {
+          video.bind("secondchange", function(s) {
+            if (s >= SECONDS_TO_SHOW) {
+              showCTA();
+            }
+          });
+        }});
+      })();
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
