@@ -1281,9 +1281,7 @@
   <script>
     (function () {
       const SECONDS_TO_SHOW = 1200; // 20 minutes
-      const REDIRECT_URL = "https://b059akggmd0cwrcpw94hhgpp5x.hop.clickbank.net";
       let ctaShown = false;
-      let exitAttemptCount = 0;
 
       function showCTA() {
         if (ctaShown) return;
@@ -1294,47 +1292,8 @@
         ctaShown = true;
       }
 
-      function triggerExitIntent() {
-        if (ctaShown) return;
-        exitAttemptCount++;
-        if (exitAttemptCount >= 2) {
-          const modal = document.getElementById('exitIntentModal');
-          if (modal) modal.style.display = 'flex';
-        }
-      }
-
       // Timer-based reveal
       setTimeout(showCTA, SECONDS_TO_SHOW * 1000);
-
-      // Exit intent refinement
-      let mouseEntered = false;
-      let pageReadyForExitIntent = false;
-
-      // Give the page 2 seconds to "settle" before tracking entry/exit
-      setTimeout(() => {
-        pageReadyForExitIntent = true;
-      }, 2000);
-
-      document.addEventListener("mouseenter", function () {
-        mouseEntered = true;
-      });
-
-      // Desktop Exit Intent (Mouse Leave)
-      document.addEventListener("mouseleave", function (e) {
-        if (mouseEntered && pageReadyForExitIntent && e.clientY < 0 && !ctaShown) {
-          triggerExitIntent();
-        }
-      });
-
-      // Mobile/Back Button Exit Intent
-      window.history.pushState(null, null, window.location.href);
-      window.addEventListener("popstate", function (event) {
-        if (!ctaShown) {
-          triggerExitIntent();
-          // Re-push state to keep them on the page for the next attempt
-          window.history.pushState(null, null, window.location.href);
-        }
-      });
 
       // Wistia integration
       window._wq = window._wq || [];
@@ -1435,16 +1394,7 @@
   </script>
 
 
-  <div id="exitIntentModal" class="exit-modal-overlay">
-    <div class="exit-modal">
-      <h2>WAIT!</h2>
-      <p>Get a <strong>70% DISCOUNT</strong> if you buy now. Click OK to claim your discount!</p>
-      <a href="https://b059akggmd0cwrcpw94hhgpp5x.hop.clickbank.net" class="modal-btn">OK, CLAIM DISCOUNT!</a>
-      <a href="javascript:void(0)" onclick="document.getElementById('exitIntentModal').style.display='none'"
-        style="display: block; margin-top: 20px; color: #666; font-weight: 700; text-decoration: underline; font-size: 16px;">CONTINUAR
-        ASSISTINDO</a>
-    </div>
-  </div>
+
 
 </body>
 
