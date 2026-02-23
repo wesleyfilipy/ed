@@ -1509,16 +1509,15 @@
       var overlay = document.getElementById('exitIntentOverlay');
       var dismiss = document.getElementById('exitDismissBtn');
 
-      // dismissCount: how many times the user dismissed the popup without buying.
-      // After 2 dismissals the popup stops appearing and they can leave freely.
+      // dismissCount: how many times the user dismissed without buying.
+      // After 2 dismissals they can leave freely.
       var dismissCount = 0;
       var overlayVisible = false;
 
       function showOverlay() {
-        if (overlayVisible) return;        // already on screen
-        if (dismissCount >= 2) return;     // user already dismissed twice – let them go
+        if (overlayVisible) return;
+        if (dismissCount >= 2) return;
         overlayVisible = true;
-        // Re-trigger pop animation
         var card = overlay.querySelector('div');
         card.style.animation = 'none';
         void card.offsetWidth;
@@ -1530,16 +1529,30 @@
         overlayVisible = false;
         dismissCount++;
         overlay.style.display = 'none';
+        // Push a fresh fake state so the NEXT back-press fires popstate again
+        if (dismissCount < 2) {
+          history.pushState({ eiBlock: true }, '');
+        }
       }
+
+      /* ---- MOBILE: History API back-button trap ---- */
+      // Push a fake state immediately so the first "back" triggers popstate
+      // instead of navigating away.
+      history.pushState({ eiBlock: true }, '');
+
+      window.addEventListener('popstate', function (e) {
+        // User pressed the native back button
+        if (dismissCount < 2) {
+          showOverlay();
+          // Re-push the fake state so the NEXT back still fires popstate
+          history.pushState({ eiBlock: true }, '');
+        }
+        // If dismissCount >= 2 we don't push again → browser navigates away normally
+      });
 
       /* ---- DESKTOP: mouse leaves through top of viewport ---- */
       document.addEventListener('mouseleave', function (e) {
         if (e.clientY <= 0) showOverlay();
-      });
-
-      /* ---- MOBILE / ALL: page hidden (back button, tab switch, back swipe) ---- */
-      document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'hidden') showOverlay();
       });
 
       /* ---- Dismiss ("Keep watching") button ---- */
