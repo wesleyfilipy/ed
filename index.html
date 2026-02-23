@@ -1396,6 +1396,162 @@
 
 
 
+
+  <!-- ===== EXIT-INTENT OVERLAY ===== -->
+  <div id="exitIntentOverlay" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 999999;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+">
+    <div style="
+    background: #fff;
+    border-radius: 22px;
+    padding: 36px 28px 28px;
+    max-width: 480px;
+    width: 92%;
+    text-align: center;
+    border: 4px solid #0cad60;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+    position: relative;
+    animation: eiPop 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  ">
+      <!-- Discount ribbon -->
+      <div style="
+      background: linear-gradient(135deg,#f53040,#c00);
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      padding:6px 20px;
+      border-radius:50px;
+      display:inline-block;
+      margin-bottom:14px;
+    ">⚡ Exclusive Offer</div>
+
+      <h2 style="
+      color:#0cad60;
+      font-size:clamp(28px,8vw,44px);
+      font-weight:900;
+      margin:0 0 6px;
+      line-height:1.1;
+      text-transform:uppercase;
+    ">70% OFF</h2>
+
+      <p style="
+      font-size:clamp(16px,4.5vw,21px);
+      color:#222;
+      line-height:1.45;
+      margin:10px 0 26px;
+      font-weight:500;
+    ">
+        Wait! Don't leave yet.<br>
+        This is your <strong style="color:#f53040;">last chance</strong> to get<br>
+        the product with a special <strong style="color:#0cad60;">70% discount</strong>.
+      </p>
+
+      <!-- Main CTA button -->
+      <a id="exitBuyBtn" href="https://b059akggmd0cwrcpw94hhgpp5x.hop.clickbank.net" target="_blank" rel="noopener"
+        style="
+        display:block;
+        background:linear-gradient(135deg,#0cad60,#04ac5b);
+        color:#fff;
+        font-size:clamp(17px,5vw,23px);
+        font-weight:900;
+        text-transform:uppercase;
+        text-decoration:none;
+        padding:18px 24px;
+        border-radius:50px;
+        box-shadow:0 8px 24px rgba(12,173,96,0.38);
+        transition:transform .2s,box-shadow .2s;
+        letter-spacing:.5px;
+        margin-bottom:16px;
+      " onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 14px 30px rgba(12,173,96,0.5)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 8px 24px rgba(12,173,96,0.38)'">🛒 BUY NOW WITH 70%
+        OFF</a>
+
+      <!-- Dismiss button -->
+      <button id="exitDismissBtn" style="
+        background:none;
+        border:none;
+        cursor:pointer;
+        color:#888;
+        font-size:13px;
+        text-decoration:underline;
+        padding:4px 8px;
+        margin-top:2px;
+      ">Keep watching</button>
+    </div>
+  </div>
+
+  <style>
+    @keyframes eiPop {
+      from {
+        opacity: 0;
+        transform: translateY(-18px) scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+
+  <script>
+    (function () {
+      var overlay = document.getElementById('exitIntentOverlay');
+      var dismiss = document.getElementById('exitDismissBtn');
+
+      // dismissCount: how many times the user dismissed the popup without buying.
+      // After 2 dismissals the popup stops appearing and they can leave freely.
+      var dismissCount = 0;
+      var overlayVisible = false;
+
+      function showOverlay() {
+        if (overlayVisible) return;        // already on screen
+        if (dismissCount >= 2) return;     // user already dismissed twice – let them go
+        overlayVisible = true;
+        // Re-trigger pop animation
+        var card = overlay.querySelector('div');
+        card.style.animation = 'none';
+        void card.offsetWidth;
+        card.style.animation = '';
+        overlay.style.display = 'flex';
+      }
+
+      function hideOverlay() {
+        overlayVisible = false;
+        dismissCount++;
+        overlay.style.display = 'none';
+      }
+
+      /* ---- DESKTOP: mouse leaves through top of viewport ---- */
+      document.addEventListener('mouseleave', function (e) {
+        if (e.clientY <= 0) showOverlay();
+      });
+
+      /* ---- MOBILE / ALL: page hidden (back button, tab switch, back swipe) ---- */
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') showOverlay();
+      });
+
+      /* ---- Dismiss ("Keep watching") button ---- */
+      dismiss.addEventListener('click', hideOverlay);
+
+      /* ---- Click on dark backdrop (outside the card) ---- */
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) hideOverlay();
+      });
+    })();
+  </script>
+
 </body>
 
 </html>
